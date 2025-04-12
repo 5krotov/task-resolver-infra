@@ -17,7 +17,7 @@ main_repo_path=<absolute-path-to-main-repo>
 cd $main_repo_path
 
 git pull
-git submodules update --remote --merge
+git submodule update --remote --merge
 git add .
-git commit message -m "Update submodules"
+git commit -m "Update submodules"
 git push
