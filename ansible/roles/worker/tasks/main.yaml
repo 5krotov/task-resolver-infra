@@ -1,0 +1,12 @@
+---
+- name: Worker | Read join command from local file
+  local_action:
+    module: slurp
+    src: join-command.txt
+  register: join_command_file
+  run_once: yes
+  delegate_to: localhost
+
+- name: Worker | Join worker to cluster
+  command: "{{ (join_command_file.content | b64decode).split('\n')[0] }}"
+  when: inventory_hostname in groups['workers']
