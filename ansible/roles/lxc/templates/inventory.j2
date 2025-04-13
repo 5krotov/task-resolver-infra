@@ -1,0 +1,4 @@
+[lxc_vms]
+{% for vm_name, vm_ip in container_ips_dict.items() %}
+{{ vm_name }} ansible_host={{ vm_ip }} ansible_user=root
+{% endfor %}

@@ -1,13 +1,8 @@
 ---
 - name: Set up Kubernetes multi-node cluster
-  hosts: kube-cluster
+  hosts: kube_cluster
   become: yes
   gather_facts: yes
-
-  vars:
-    kube_version: "1.28.0"
-    pod_network_cidr: "10.244.0.0/16"
-    service_cidr: "10.96.0.0/12"
 
   roles:
     - common

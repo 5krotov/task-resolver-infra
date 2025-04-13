@@ -1,0 +1,55 @@
+---
+- name: LXC | Install LXC and dependencies
+  apt:
+    name:
+      - lxc
+      - lxc-templates
+      - bridge-utils
+      - python3-lxc
+    state: present
+    update_cache: yes
+
+- name: LXC | Create LXC containers
+  community.general.lxc_container:
+    name: "{{ item }}"
+    template: download
+    template_options: --dist ubuntu --release jammy --arch amd64
+    state: started
+  loop: "{{ vms }}"
+
+- name: LXC | Get container IP addresses in raw format
+  command: lxc-info -n {{ item }} -iH
+  loop: "{{ vms }}"
+  register: container_ips_raw
+  changed_when: false
+
+- name: LXC | Trim container IPs
+  set_fact:
+    container_ips: >-
+      {{ container_ips | default([]) + [item.stdout | trim] }}
+  loop: "{{ container_ips_raw.results }}"
+
+- name: LXC | Set container IPs as facts
+  set_fact:
+    container_ips_dict: >-
+      {{ container_ips_dict | default({}) | combine({ item[0]: item[1] }) }}
+  loop: "{{ vms | zip(container_ips) }}"
+
+- name: LXC | Configure SSH in containers
+  command: |
+    lxc-attach -n {{ item }} -- bash -c '
+    apt-get update && 
+    apt-get install -y openssh-server && 
+    mkdir -p /root/.ssh && 
+    echo "{{ lookup("file", public_key) }}" >> /root/.ssh/authorized_keys && 
+    sed -i "s/#PermitRootLogin.*/PermitRootLogin prohibit-password/" /etc/ssh/sshd_config && 
+    systemctl restart ssh
+    '
+  loop: "{{ vms }}"
+
+- name: LXC | Create inventory file on the localhost
+  template:
+    src: inventory.j2
+    dest: "{{ playbook_dir }}/generated/inventory/lxc_vms.ini"
+    mode: 0644
+  delegate_to: localhost
