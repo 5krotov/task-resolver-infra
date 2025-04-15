@@ -14,6 +14,11 @@
   register: incus_initialized
 
 - name: Incus | Install | Initialize
+  command: incus admin init --minimal
+  when: not incus_initialized.stat.exists and not incus_preseed_init
+
+- name: Incus | Install | Initialize
+  # Not working properly at the moment
   block:
     - name: Incus | Install | Initialize | Create preseed configuration directory
       file:
@@ -21,17 +26,17 @@
         state: directory
         mode: '0755'
 
-    - name:  Incus | Install | Initialize | Generate preseed configuration
+    - name:  Incus | Install | Initialize | Copy preseed configuration
       copy:
-        src: incus-preseed.yaml
+        src: incus-off-doc-preseed.yaml
         dest: /etc/incus/preseed/init.yaml
         mode: '0644'
 
     - name: Incus | Install | Initialize | Initialize with preseed
       command: incus admin init --preseed /etc/incus/preseed/init.yaml
-  when: not incus_initialized.stat.exists
+  when: not incus_initialized.stat.exists and incus_preseed_init
 
-- name: Wait for Incus socket
+- name: Incus | Install | Wait for Incus socket
   wait_for:
     path: /var/lib/incus/unix.socket
     state: started

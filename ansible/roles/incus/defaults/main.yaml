@@ -5,6 +5,7 @@ vms:
 
 public_key: ~/.ssh/task-resolver-key.pub
 
+incus_preseed_init: false
 # NB: Not used at the moment
 incus_storage_pool_name: "default"
 incus_storage_pool_device: ""  # Leave empty for dir backend, or specify a device like "/dev/sdb"
