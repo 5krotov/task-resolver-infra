@@ -3,9 +3,11 @@ vms:
   - worker-node-1
   - worker-node-2
 
-public_key: ~/.ssh/task-resolver-key.pub
+public_key: ~/.ssh/task-resolver/task-resolver-key.pub
 
 incus_preseed_init: false
+incus_mtu: 1450
+
 # NB: Not used at the moment
 incus_storage_pool_name: "default"
 incus_storage_pool_device: ""  # Leave empty for dir backend, or specify a device like "/dev/sdb"

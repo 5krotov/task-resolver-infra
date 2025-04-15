@@ -3,6 +3,7 @@
   package:
     name:
       - incus
+      - attr
       - zfsutils-linux  # storage
       - bridge-utils  # network
     state: present
