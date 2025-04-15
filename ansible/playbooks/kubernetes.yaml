@@ -1,16 +1,30 @@
----
 - name: Set up Kubernetes multi-node cluster
   hosts: incus_vms
   become: yes
   gather_facts: yes
   roles:
-    - common
+    - k8s-common
 
 - name: Configure Kubernetes master node
   hosts: master
   become: yes
   roles:
     - master
+
+  post_tasks:
+    - name: Get kubeconfig using kubectl
+      command: kubectl config view --flatten
+      register: kubeconfig_output
+
+    - name: Get pwd
+      set_fact:
+        _pwd: "{{ lookup('env', 'PWD') }}"
+
+    - name: Save kubeconfig locally
+      local_action:
+        module: copy
+        content: "{{ kubeconfig_output.stdout }}"
+        dest: "{{ _pwd }}/kube-config"
 
 - name: Configure Kubernetes worker nodes
   hosts: workers

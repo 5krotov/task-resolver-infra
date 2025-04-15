@@ -51,11 +51,11 @@
 - name: Incus | Configure | Configure SSH in containers
   shell: |
     incus exec {{ item }} -- bash -c '
-    apt-get update && 
-    apt-get install -y openssh-server && 
-    mkdir -p /root/.ssh && 
-    echo "{{ lookup("file", public_key) }}" >> /root/.ssh/authorized_keys && 
-    sed -i "s/#PermitRootLogin.*/PermitRootLogin prohibit-password/" /etc/ssh/sshd_config && 
+    apt-get update &&
+    apt-get install -y openssh-server &&
+    mkdir -p /root/.ssh &&
+    echo "{{ lookup("file", public_key) }}" >> /root/.ssh/authorized_keys &&
+    sed -i "s/#PermitRootLogin.*/PermitRootLogin prohibit-password/" /etc/ssh/sshd_config &&
     systemctl restart ssh
     '
   loop: "{{ vms }}"

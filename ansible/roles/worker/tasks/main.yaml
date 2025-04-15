@@ -1,12 +1,16 @@
 ---
+- name: Worker | Get pwd
+  set_fact:
+    _pwd: "{{ lookup('env', 'PWD') }}"
+
 - name: Worker | Read join command from local file
   local_action:
     module: slurp
-    src: join-command.txt
+    src: "{{ _pwd }}/generated/k8s-join-command.txt"
   register: join_command_file
   run_once: yes
-  delegate_to: localhost
+  # delegate_to: localhost
 
 - name: Worker | Join worker to cluster
   command: "{{ (join_command_file.content | b64decode).split('\n')[0] }}"
-  when: inventory_hostname in groups['workers']
+  # when: inventory_hostname in groups['workers']

@@ -1,6 +1,10 @@
 ---
 - name: Master | Initialize Kubernetes cluster
-  command: kubeadm init --pod-network-cidr={{ pod_network_cidr }} --service-cidr={{ service_cidr }} --ignore-preflight-errors=Swap
+  command: >
+    kubeadm init
+      --pod-network-cidr={{ pod_network_cidr }}
+      --service-cidr={{ service_cidr }}
+      --ignore-preflight-errors=Swap
   register: kubeadm_init
 
 - name: Master | Create .kube directory
@@ -25,11 +29,15 @@
 - name: Master | Generate join command
   command: kubeadm token create --print-join-command
   register: join_command
-  when: inventory_hostname in groups['master'][0]
+  # when: inventory_hostname in groups['master'][0]
+
+- name: Master | Get pwd
+  set_fact:
+    _pwd: "{{ lookup('env', 'PWD') }}"
 
 - name: Master | Save join command to local file
   local_action:
     module: copy
     content: "{{ join_command.stdout }}"
-    dest: "join-command.txt"
-  when: inventory_hostname in groups['master'][0]
+    dest: "{{ _pwd }}/generated/k8s-join-command.txt"
+  # when: inventory_hostname in groups['master'][0]
