@@ -1,0 +1,38 @@
+---
+- name: Incus | Install | Install Incus and dependencies
+  package:
+    name:
+      - incus
+      - zfsutils-linux  # storage
+      - bridge-utils  # network
+    state: present
+    update_cache: yes
+
+- name: Incus | Install | Check if Incus is initialized
+  stat:
+    path: /var/lib/incus/server.crt
+  register: incus_initialized
+
+- name: Incus | Install | Initialize
+  block:
+    - name: Incus | Install | Initialize | Create preseed configuration directory
+      file:
+        path: /etc/incus/preseed
+        state: directory
+        mode: '0755'
+
+    - name:  Incus | Install | Initialize | Generate preseed configuration
+      copy:
+        src: incus-preseed.yaml
+        dest: /etc/incus/preseed/init.yaml
+        mode: '0644'
+
+    - name: Incus | Install | Initialize | Initialize with preseed
+      command: incus admin init --preseed /etc/incus/preseed/init.yaml
+  when: not incus_initialized.stat.exists
+
+- name: Wait for Incus socket
+  wait_for:
+    path: /var/lib/incus/unix.socket
+    state: started
+    timeout: 60

@@ -2,7 +2,7 @@
 - hosts: kube_deploy
   gather_facts: yes
   roles:
-    - lxc
+    - incus
 
   post_tasks:
     - name: Display generated inventory information

@@ -1,6 +1,0 @@
-vms:
-  - master-node
-  - worker-node-1
-  - worker-node-2
-
-public_key: ~/.ssh/task-resolver-key.pub
