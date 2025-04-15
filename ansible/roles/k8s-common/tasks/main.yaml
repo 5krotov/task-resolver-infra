@@ -22,28 +22,21 @@
     update_cache: yes
     state: present
 
-- name: Kubernetes Common | Add Docker GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+- name: Kubernetes Common | Add Docker GPG key and repository
+  # Source: https://docs.docker.com/engine/install/ubuntu/
+  shell: |
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
 
-- name: Kubernetes Common | Get container arhitecture
-  block:
-    - shell: dpkg --print-architecture
-      register: _arch_raw
-
-    - set_fact:
-        _arch: "{{ _arch_raw.stdout | trim }}"
-
-- name: Kubernetes Common | Add Docker repository
-  apt_repository:
-    repo: "deb [arch={{ _arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-    update_cache: yes
+      # Add the repository to Apt sources:
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 - name: Kubernetes Common | Install Docker
   apt:
-    name: 
+    name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
@@ -56,36 +49,41 @@
     state: started
     enabled: yes
 
-- name: Kubernetes Common | Add Kubernetes GPG key
-  apt_key:
-    url: "https://pkgs.k8s.io/core:/stable:/v{{ kube_version.split('.')[0] }}.{{ kube_version.split('.')[1] }}/deb/Release.key"
-    state: present
+- name: Kubernetes Common | Add Kubernetes GPG key and repository
+  # Source: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management
+  shell: |
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key \
+    | gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-- name: Kubernetes Common | Add Kubernetes repository
-  apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kube_version.split('.')[0] }}.{{ kube_version.split('.')[1] }}/deb/ /"
-    state: present
-    update_cache: yes
+    # allow unprivileged APT programs to read this keyring
+    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' \
+    | tee /etc/apt/sources.list.d/kubernetes.list
+
+    # helps tools such as command-not-found to work correctly
+    chmod 644 /etc/apt/sources.list.d/kubernetes.list
+  run_once: yes
 
 - name: Kubernetes Common | Install kubelet, kubeadm and kubectl
   apt:
     name:
-      - "kubelet={{ kube_version }}-00"
-      - "kubeadm={{ kube_version }}-00"
-      - "kubectl={{ kube_version }}-00"
+      - "kubelet={{ kube_version }}-1.1"
+      - "kubeadm={{ kube_version }}-1.1"
+      - "kubectl={{ kube_version }}-1.1"
     state: present
     update_cache: yes
 
 - name: Kubernetes Common | Hold kubelet, kubeadm and kubectl at current version
   command: apt-mark hold kubelet kubeadm kubectl
 
-- name: Kubernetes Common | Configure sysctl
-  sysctl:
-    name: "{{ item.key }}"
-    value: "{{ item.value }}"
-    state: present
-    reload: yes
-  with_items:
-    - { key: 'net.bridge.bridge-nf-call-iptables', value: '1' }
-    - { key: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
-    - { key: 'net.ipv4.ip_forward', value: '1' }
+# - name: Kubernetes Common | Configure sysctl
+#   sysctl:
+#     name: "{{ item.key }}"
+#     value: "{{ item.value }}"
+#     state: present
+#     reload: yes
+#   with_items:
+#     - { key: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+#     - { key: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+#     - { key: 'net.ipv4.ip_forward', value: '1' }
