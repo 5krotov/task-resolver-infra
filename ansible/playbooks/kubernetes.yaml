@@ -1,9 +1,8 @@
 ---
 - name: Set up Kubernetes multi-node cluster
-  hosts: kube_cluster
+  hosts: incus_vms
   become: yes
   gather_facts: yes
-
   roles:
     - common
 

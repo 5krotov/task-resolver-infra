@@ -1,4 +1,17 @@
-[incus_vms]
+[master]
 {% for vm_name, vm_ip in container_ips_dict.items() %}
+{% if vm_name.startswith('master') %}
 {{ vm_name }} ansible_host={{ vm_ip }} ansible_user=root
+{% endif %}
 {% endfor %}
+
+[workers]
+{% for vm_name, vm_ip in container_ips_dict.items() %}
+{% if vm_name.startswith('worker') %}
+{{ vm_name }} ansible_host={{ vm_ip }} ansible_user=root
+{% endif %}
+{% endfor %}
+
+[incus_vms:children]
+master
+workers

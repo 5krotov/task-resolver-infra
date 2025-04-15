@@ -1,4 +1,8 @@
 vms:
+  #
+  # master nodes names should start with 'master'
+  # worker nodes names should start with 'worker'
+  #
   - master-node
   - worker-node-1
   - worker-node-2
