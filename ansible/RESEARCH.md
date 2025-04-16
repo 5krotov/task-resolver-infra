@@ -18,5 +18,5 @@ EOF
 
 ## Container d
 
-remove `disabled_plugins = ["cri"]` from `/etc/containerd/config.toml`. Run
+Remove `disabled_plugins = ["cri"]` in `/etc/containerd/config.toml`. Run
 `systemctl restart containerd`.
