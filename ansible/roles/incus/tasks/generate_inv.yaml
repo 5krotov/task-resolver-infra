@@ -1,0 +1,18 @@
+---
+- name: Incus | Generate inv | Get pwd
+  set_fact:
+    _pwd: "{{ lookup('env', 'PWD') }}"
+
+- name: Incus | Generate inv | Create 'generated' dir on the localhost
+  file:
+    path: "{{ _pwd }}/generated/inventory/"
+    state: directory
+    mode: 0755
+  delegate_to: localhost
+
+- name: Incus | Generate inv | Generate inventory file on the localhost
+  template:
+    src: inventory.ini.j2
+    dest: "{{ _pwd }}/generated/inventory/incus_vms.ini"
+    mode: 0644
+  delegate_to: localhost

@@ -1,0 +1,36 @@
+config:
+  core.https_address: '[::]:8443'
+  core.trust_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+
+storage_pools:
+- name: {{ incus_storage_pool_name }}
+  driver: {% if incus_storage_pool_device %}zfs{% else %}dir{% endif %}
+  {% if incus_storage_pool_device %}
+  config:
+    source: {{ incus_storage_pool_device }}
+    size: {{ incus_storage_pool_size }}
+  {% endif %}
+
+networks:
+- name: {{ incus_network_bridge_name }}
+  type: bridge
+  config:
+    ipv4.address: {{ incus_network_bridge_ipv4_address }}
+    ipv4.nat: "{{ incus_network_bridge_ipv4_nat }}"
+    ipv6.address: "{{ incus_network_bridge_ipv6_address }}"
+
+profiles:
+- name: default
+  devices:
+    eth0:
+      name: eth0
+      network: {{ incus_network_bridge_name }}
+      type: nic
+    root:
+      path: /
+      pool: {{ incus_storage_pool_name }}
+      type: disk
+  config:
+    {% for key, value in incus_default_profile_settings.items() %}
+    {{ key }}: "{{ value }}"
+    {% endfor %}

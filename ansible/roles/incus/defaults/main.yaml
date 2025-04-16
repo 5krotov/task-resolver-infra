@@ -1,0 +1,27 @@
+vms:
+  #
+  # master nodes names should start with 'master'
+  # worker nodes names should start with 'worker'
+  #
+  - master-node
+  - worker-node-1
+  - worker-node-2
+
+public_key: ~/.ssh/task-resolver/task-resolver-key.pub
+
+incus_preseed_init: false
+incus_mtu: 1450
+
+# NB: Not used at the moment
+incus_storage_pool_name: "default"
+incus_storage_pool_device: ""  # Leave empty for dir backend, or specify a device like "/dev/sdb"
+incus_storage_pool_size: "10GB" # Only used with ZFS or btrfs
+incus_network_bridge_name: "incusbr0"
+incus_network_bridge_ipv4_address: "10.0.0.1/24"
+incus_network_bridge_ipv4_nat: "true"
+incus_network_bridge_ipv6_address: "none"
+
+incus_default_profile_settings:
+  limits.cpu: "2"
+  limits.memory: "2GB"
+  boot.autostart: "false"

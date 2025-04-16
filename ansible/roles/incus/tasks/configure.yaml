@@ -1,0 +1,62 @@
+---
+- name: Incus | Configure | Set up MTU
+  block:
+    - name: Incus | Configure | Set up MTU on containers | insubr0
+      command: incus network set incusbr0 bridge.mtu={{ incus_mtu }}
+
+- name: Incus | Configure | Check if target container exists
+  block:
+    - name: Incus | Configure | Check if target container exists | Grep containers
+      shell: "incus list -c n4 | grep -q {{ item }}"
+      ignore_errors: true
+      register: _grep_results
+      loop: "{{ vms }}"
+
+    - name: Incus | Configure | Check if target container exists | Process grep results
+      set_fact:
+        vms_to_create: "{{ vms_to_create | default([]) + [item.item] }}"
+      when: item is failed
+      loop: "{{ _grep_results.results }}"
+
+- name: Incus | Configure | Create Incus containers
+  shell: "incus launch images:ubuntu/22.04 {{ item }}"
+  loop: "{{ vms_to_create }}"
+  when: vms_to_create is defined and vms_to_create
+
+- name: Incus | Configure | Get container IP addresses in raw format
+  shell: >
+    incus list -c n4
+    | grep {{ item }}
+    | grep -o -E '[0-9]+.[0-9]+.[0-9]+.[0-9]+'
+  register: _container_ips_raw
+  loop: "{{ vms }}"
+  changed_when: false
+
+- name: Incus | Configure | Trim container IPs
+  set_fact:
+    container_ips: "{{ container_ips | default([]) + [item.stdout | trim] }}"
+  loop: "{{ _container_ips_raw.results }}"
+
+- name: Incus | Configure | Debug IPs
+  debug:
+    msg: "{{ item }}"
+  loop: "{{ container_ips }}"
+
+- name: Incus | Configure | Set container IPs as facts
+  set_fact:
+    container_ips_dict: >-
+      {{ container_ips_dict | default({}) | combine({ item[0]: item[1] }) }}
+  loop: "{{ vms | zip(container_ips) }}"
+
+- name: Incus | Configure | Configure SSH in containers
+  shell: |
+    incus exec {{ item }} -- bash -c '
+    apt-get update &&
+    apt-get install -y openssh-server &&
+    mkdir -p /root/.ssh &&
+    echo "{{ lookup("file", public_key) }}" >> /root/.ssh/authorized_keys &&
+    sed -i "s/#PermitRootLogin.*/PermitRootLogin prohibit-password/" /etc/ssh/sshd_config &&
+    systemctl restart ssh
+    '
+  loop: "{{ vms }}"
+

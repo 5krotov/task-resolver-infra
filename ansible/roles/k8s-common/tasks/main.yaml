@@ -1,0 +1,88 @@
+---
+- name: Kubernetes Common | Disable swap
+  command: swapoff -a
+  ignore_errors: yes
+
+- name: Kubernetes Common | Disable swap permanently
+  lineinfile:
+    path: /etc/fstab
+    regexp: '^/dev/mapper/.*swap'
+    line: '#\0'
+    backrefs: yes
+
+- name: Kubernetes Common | Install dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - software-properties-common
+    update_cache: yes
+    state: present
+
+- name: Kubernetes Common | Add Docker GPG key and repository
+  # Source: https://docs.docker.com/engine/install/ubuntu/
+  shell: |
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
+
+      # Add the repository to Apt sources:
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+- name: Kubernetes Common | Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+    update_cache: yes
+
+- name: Kubernetes Common | Ensure Docker is running and enabled
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Kubernetes Common | Add Kubernetes GPG key and repository
+  # Source: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management
+  shell: |
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key \
+    | gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    # allow unprivileged APT programs to read this keyring
+    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' \
+    | tee /etc/apt/sources.list.d/kubernetes.list
+
+    # helps tools such as command-not-found to work correctly
+    chmod 644 /etc/apt/sources.list.d/kubernetes.list
+
+- name: Kubernetes Common | Install kubelet, kubeadm and kubectl
+  apt:
+    name:
+      - "kubelet={{ kube_version }}-1.1"
+      - "kubeadm={{ kube_version }}-1.1"
+      - "kubectl={{ kube_version }}-1.1"
+    state: present
+    update_cache: yes
+
+- name: Kubernetes Common | Hold kubelet, kubeadm and kubectl at current version
+  command: apt-mark hold kubelet kubeadm kubectl
+
+# - name: Kubernetes Common | Configure sysctl
+#   sysctl:
+#     name: "{{ item.key }}"
+#     value: "{{ item.value }}"
+#     state: present
+#     reload: yes
+#   with_items:
+#     - { key: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+#     - { key: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+#     - { key: 'net.ipv4.ip_forward', value: '1' }

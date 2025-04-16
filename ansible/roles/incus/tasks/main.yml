@@ -1,0 +1,9 @@
+---
+- name: Incus | Install and set up Incus
+  include_tasks: install.yaml
+
+- name: Incus | Configure
+  include_tasks: configure.yaml
+
+- name: Incus | Generate inv
+  include_tasks: generate_inv.yaml

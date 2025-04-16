@@ -1,0 +1,18 @@
+---
+- hosts: kube_deploy
+  gather_facts: yes
+  roles:
+    - incus
+
+  post_tasks:
+    - name: Display generated inventory information
+      debug:
+        msg: |-
+          LXC VMs created successfully!
+          Inventory file: {{ playbook_dir }}/generated/inventory/lxc_vms.ini
+
+    - name: Display connection information
+      debug:
+        msg: |-
+          Connect to {{ item.key }}: ssh root@{{ item.value }}
+      with_dict: "{{ container_ips_dict }}"
