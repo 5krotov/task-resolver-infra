@@ -9,8 +9,8 @@ metadata:
   name: agent
 spec:
   ports:
-    - name: "9999"
-      port: 9999
+    - name: "8080"
+      port: 8080
       targetPort: 8080
   selector:
     io.kompose.service: agent

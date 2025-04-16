@@ -26,6 +26,7 @@ spec:
         - name: harbor-creds
       containers:
         - image: harbor.devops-teta.ru/bergman-valery/worker:latest
+          imagePullPolicy: Always
           name: worker-service
           ports:
             - containerPort: 8080

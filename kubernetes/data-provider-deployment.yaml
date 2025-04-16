@@ -33,6 +33,7 @@ spec:
             - name: REDIS_PASSWORD
               value: myredispassword
           image: harbor.devops-teta.ru/bergman-valery/data-provider:latest
+          imagePullPolicy: Always
           name: data-provider-service
           ports:
             - containerPort: 8080

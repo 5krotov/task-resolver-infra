@@ -27,6 +27,7 @@ spec:
             - name: BASE_REST_API_URL
               value: https://bergman-task-resolver-api.mfti.devops-teta.ru/api/v1
           image: harbor.devops-teta.ru/bergman-valery/web-ui:latest
+          imagePullPolicy: Always
           name: web-ui
           ports:
             - containerPort: 3000
