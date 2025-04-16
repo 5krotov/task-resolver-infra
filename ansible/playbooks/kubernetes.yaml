@@ -24,7 +24,7 @@
       local_action:
         module: copy
         content: "{{ kubeconfig_output.stdout }}"
-        dest: "{{ _pwd }}/kube-config"
+        dest: "{{ _pwd }}/generated/kube-config"
 
 - name: Configure Kubernetes worker nodes
   hosts: workers

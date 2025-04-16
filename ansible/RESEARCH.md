@@ -15,3 +15,8 @@ networks:
     ipv6.address: none
 EOF
 ```
+
+## Container d
+
+remove `disabled_plugins = ["cri"]` from `/etc/containerd/config.toml`. Run
+`systemctl restart containerd`.

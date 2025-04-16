@@ -63,7 +63,6 @@
 
     # helps tools such as command-not-found to work correctly
     chmod 644 /etc/apt/sources.list.d/kubernetes.list
-  run_once: yes
 
 - name: Kubernetes Common | Install kubelet, kubeadm and kubectl
   apt:

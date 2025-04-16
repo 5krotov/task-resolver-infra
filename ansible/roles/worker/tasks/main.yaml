@@ -8,7 +8,7 @@
     module: slurp
     src: "{{ _pwd }}/generated/k8s-join-command.txt"
   register: join_command_file
-  run_once: yes
+  # run_once: yes
   # delegate_to: localhost
 
 - name: Worker | Join worker to cluster
