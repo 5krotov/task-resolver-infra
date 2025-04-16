@@ -25,7 +25,7 @@ spec:
       imagePullSecrets:
         - name: harbor-creds
       containers:
-        - image: harbor.devops-teta.ru/bergman-valery/worker@sha256:799e9277abcfb8ad1605b3e5139c9316f51324e383e83c88f57506943af4fe25
+        - image: harbor.devops-teta.ru/bergman-valery/worker:latest
           name: worker-service
           ports:
             - containerPort: 8080

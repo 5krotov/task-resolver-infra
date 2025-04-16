@@ -32,7 +32,7 @@ spec:
               value: myuser
             - name: REDIS_PASSWORD
               value: myredispassword
-          image: harbor.devops-teta.ru/bergman-valery/data-provider@sha256:c7b77c47ad68812ca9494face788bd63ce625704f24faad67e6fc80195827878
+          image: harbor.devops-teta.ru/bergman-valery/data-provider:latest
           name: data-provider-service
           ports:
             - containerPort: 8080

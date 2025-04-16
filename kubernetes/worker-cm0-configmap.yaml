@@ -5,7 +5,7 @@ data:
       addr: 0.0.0.0:8080
 
     kafka:
-      addr: kafka-svc:9092
+      addr: kafka-cluster:9092
       group: ""
       task_topic: tasks
       status_topic: task-status

@@ -8,7 +8,7 @@ metadata:
     io.kompose.service: api
   name: api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       io.kompose.service: api
@@ -25,7 +25,7 @@ spec:
       imagePullSecrets:
         - name: harbor-creds
       containers:
-        - image: harbor.devops-teta.ru/bergman-valery/api@sha256:1514ceb1e4769ee0660086710852501edb31063d5cf5507e536614d8d2cda861
+        - image: harbor.devops-teta.ru/bergman-valery/api:latest
           name: api-service
           ports:
             - containerPort: 8080

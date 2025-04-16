@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ui-nginx-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - bergman-task-resolver-web-ui.mfti.devops-teta.ru
+    secretName: web-ui-tls-secret-le
+  rules:
+  - host: bergman-task-resolver-web-ui.mfti.devops-teta.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-ui
+            port:
+              number: 80

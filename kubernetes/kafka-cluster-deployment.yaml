@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+    kompose.cmd: kompose convert -f docker-compose.yaml -o new
     kompose.version: 1.35.0 (HEAD)
   labels:
-    io.kompose.service: kafka-svc
-  name: kafka
+    io.kompose.service: kafka-cluster
+  name: kafka-cluster
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: kafka-svc
+      io.kompose.service: kafka-cluster
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+        kompose.cmd: kompose convert -f docker-compose.yaml -o new
         kompose.version: 1.35.0 (HEAD)
       labels:
-        io.kompose.service: kafka-svc
+        io.kompose.service: kafka-cluster
     spec:
       containers:
         - env:
