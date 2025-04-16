@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: web-ui-le-crt
+spec:
+  secretName: web-ui-tls-secret-le
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt
+  commonName: bergman-task-resolver-web-ui.mfti.devops-teta.ru
+  dnsNames:
+  - bergman-task-resolver-web-ui.mfti.devops-teta.ru

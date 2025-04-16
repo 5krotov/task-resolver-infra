@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: zookeeper
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: zookeeper
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: zookeeper
+    spec:
+      containers:
+        - env:
+            - name: ZOOKEEPER_JVMFLAGS
+              value: -Xmx2g -Xms2g
+          image: wurstmeister/zookeeper
+          name: zookeeper
+          ports:
+            - containerPort: 2181
+              protocol: TCP
+      restartPolicy: Always

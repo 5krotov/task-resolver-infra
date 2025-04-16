@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: redis
+    spec:
+      containers:
+        - env:
+            - name: REDIS_PASSWORD
+              value: myredispassword
+          image: redis:latest
+          name: redis-cache
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+      restartPolicy: Always

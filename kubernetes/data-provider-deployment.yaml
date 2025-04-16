@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: data-provider
+  name: data-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: data-provider
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: data-provider
+    spec:
+      imagePullSecrets:
+        - name: harbor-creds
+      containers:
+        - env:
+            - name: POSTGRES_PASSWORD
+              value: mypassword
+            - name: POSTGRES_USER
+              value: myuser
+            - name: REDIS_PASSWORD
+              value: myredispassword
+          image: harbor.devops-teta.ru/bergman-valery/data-provider:latest
+          imagePullPolicy: Always
+          name: data-provider-service
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/data-provider-service/config.yaml
+              name: data-provider-cm0
+              subPath: config.yaml
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: data-provider-config.yaml
+                path: config.yaml
+            name: data-provider-cm0
+          name: data-provider-cm0

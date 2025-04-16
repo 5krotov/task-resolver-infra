@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: agent
+  name: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: agent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: agent
+    spec:
+      imagePullSecrets:
+        - name: harbor-creds
+      containers:
+        - image: harbor.devops-teta.ru/bergman-valery/agent:latest
+          imagePullPolicy: Always
+          name: agent-service
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/agent-service/config.yaml
+              name: agent-cm0
+              subPath: config.yaml
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: agent-config.yaml
+                path: config.yaml
+            name: agent-cm0
+          name: agent-cm0
