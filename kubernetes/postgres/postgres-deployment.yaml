@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
@@ -8,6 +8,7 @@ metadata:
     io.kompose.service: postgres
   name: postgres
 spec:
+  serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
@@ -33,4 +34,16 @@ spec:
           ports:
             - containerPort: 5432
               protocol: TCP
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
       restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        storageClassName: postgres-nfs-csi
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 2Gi
