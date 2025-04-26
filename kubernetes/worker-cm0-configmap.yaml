@@ -1,18 +1,16 @@
 apiVersion: v1
 data:
   worker-config.yaml: |
-    http:
-      addr: 0.0.0.0:8080
-
     kafka:
       addr: kafka-cluster:9092
-      group: ""
+      group: worker-group
       task_topic: tasks
       status_topic: task-status
+      timeout: 10s
+      retries: 3
 
     worker:
-      queue_size: 2
-      threads: 2
+      timescale: 10s
 kind: ConfigMap
 metadata:
   annotations:
