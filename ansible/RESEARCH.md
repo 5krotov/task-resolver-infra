@@ -20,3 +20,7 @@ EOF
 
 Remove `disabled_plugins = ["cri"]` in `/etc/containerd/config.toml`. Run
 `systemctl restart containerd`.
+
+## See also
+
+https://github.com/ccollicutt/install-kubernetes
