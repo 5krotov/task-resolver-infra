@@ -10,7 +10,7 @@ data:
       retries: 3
 
     worker:
-      timescale: 10s
+      timescale: 1s
 kind: ConfigMap
 metadata:
   annotations:
