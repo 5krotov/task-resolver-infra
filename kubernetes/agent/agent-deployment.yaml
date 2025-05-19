@@ -35,6 +35,8 @@ spec:
             - mountPath: /etc/agent-service/config.yaml
               name: agent-cm0
               subPath: config.yaml
+            - mountPath: /certs
+              name: certs
       restartPolicy: Always
       volumes:
         - configMap:
@@ -43,3 +45,6 @@ spec:
                 path: config.yaml
             name: agent-cm0
           name: agent-cm0
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs

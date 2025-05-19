@@ -5,9 +5,17 @@ data:
       http:
         addr: 0.0.0.0:8080
     agent:
-      addr: http://agent:8080
+      addr: agent:8080
+      useTLS: true
+      grpcServerName: "agent-service"
     data-provider:
-      addr: http://data-provider:8080
+      addr: data-provider:8080
+      useTLS: true
+      grpcServerName: "data-provider-service"
+    grpc-client:
+      caCert: "/certs/internal/internal-ca.pem"
+      clientCert: "/certs/api-service/api-service.pem"
+      clientKey: "/certs/api-service/api-service-key.pem"
 kind: ConfigMap
 metadata:
   annotations:

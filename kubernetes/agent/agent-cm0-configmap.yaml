@@ -7,10 +7,21 @@ data:
       task_topic: tasks
       status_topic: task-status
     data-provider:
-      addr: http://data-provider:8080
+      addr: data-provider:8080
+      useTLS: true
+      grpcServerName: "data-provider-service"
     agent:
-      http:
+      grpc:
+        network: "tcp"
         addr: 0.0.0.0:8080
+        useTLS: true
+        cert: "/certs/agent-service/agent-service.pem"
+        key: "/certs/agent-service/agent-service-key.pem"
+        ca: "/certs/internal/internal-ca.pem"
+    grpc-client:
+      caCert: "/certs/internal/internal-ca.pem"
+      clientCert: "/certs/agent-service/agent-service.pem"
+      clientKey: "/certs/agent-service/agent-service-key.pem"
 kind: ConfigMap
 metadata:
   annotations:

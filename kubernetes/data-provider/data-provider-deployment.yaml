@@ -42,6 +42,8 @@ spec:
             - mountPath: /etc/data-provider-service/config.yaml
               name: data-provider-cm0
               subPath: config.yaml
+            - mountPath: /certs
+              name: certs
       restartPolicy: Always
       volumes:
         - configMap:
@@ -50,3 +52,6 @@ spec:
                 path: config.yaml
             name: data-provider-cm0
           name: data-provider-cm0
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
