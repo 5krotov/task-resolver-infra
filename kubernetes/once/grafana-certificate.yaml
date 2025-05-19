@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: grafana-le-crt
+  namespace: bergman-hl-metrics
+spec:
+  secretName: grafana-tls-secret-le
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt
+  commonName: bergman-task-resolver-grafana.mfti.devops-teta.ru
+  dnsNames:
+  - bergman-task-resolver-grafana.mfti.devops-teta.ru
