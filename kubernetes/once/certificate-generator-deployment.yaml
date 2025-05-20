@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: batch/v1
 kind: Job
 metadata:
   annotations:
@@ -7,12 +7,9 @@ metadata:
   labels:
     io.kompose.service: certificate-generator
   name: certificate-generator
+  namespace: bergman-hl
 spec:
-  replicas: 1
   ttlSecondsAfterFinished: 60
-  selector:
-    matchLabels:
-      io.kompose.service: certificate-generator
   template:
     metadata:
       annotations:
@@ -21,15 +18,18 @@ spec:
       labels:
         io.kompose.service: certificate-generator
     spec:
+      imagePullSecrets:
+        - name: harbor-creds
       containers:
-        - args:
+        - name: certificate-generator
+          image: harbor.devops-teta.ru/bergman-valery/certificate-generator:latest
+          imagePullPolicy: Always
+          args:
             - /configs
             - /certs
             - api-service
             - agent-service
             - data-provider-service
-          image: certificate-generator
-          name: certificate-generator
           volumeMounts:
             - mountPath: /configs
               name: certs-configs

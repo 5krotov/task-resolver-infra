@@ -5,6 +5,7 @@ metadata:
     io.kompose.service: certs
   name: certs
 spec:
+  storageClassName: nfs-csi
   accessModes:
     - ReadWriteOnce
   resources:
