@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o /tmp/k8s/
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: certificate-generator
+  name: certificate-generator
+  namespace: bergman-hl
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o /tmp/k8s/
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: certificate-generator
+    spec:
+      imagePullSecrets:
+        - name: harbor-creds
+      containers:
+        - name: certificate-generator
+          image: harbor.devops-teta.ru/bergman-valery/certificate-generator:latest
+          imagePullPolicy: Always
+          args:
+            - /configs
+            - /certs
+            - api-service
+            - agent-service
+            - data-provider-service
+          volumeMounts:
+            - mountPath: /configs
+              name: certs-configs
+            - mountPath: /certs
+              name: certs
+      restartPolicy: OnFailure
+      volumes:
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs
+        - name: certs-configs
+          configMap:
+            name: certs-configs
+            items:
+              - key: internal-ca.conf
+                path: internal/internal-ca.conf
+              - key: root-ca.conf
+                path: root/root-ca.conf
+              - key: agent-service.conf
+                path: services/agent-service.conf
+              - key: api-service.conf
+                path: services/api-service.conf
+              - key: data-provider-service.conf
+                path: services/data-provider-service.conf

@@ -5,13 +5,13 @@ metadata:
     kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
     kompose.version: 1.35.0 (HEAD)
   labels:
-    io.kompose.service: data-provider
-  name: data-provider
+    io.kompose.service: agent
+  name: agent
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      io.kompose.service: data-provider
+      io.kompose.service: agent
   strategy:
     type: Recreate
   template:
@@ -20,33 +20,31 @@ spec:
         kompose.cmd: kompose convert -f task-resolver/.docker/docker-compose.yaml -o task-resolver-infra/kubernetes
         kompose.version: 1.35.0 (HEAD)
       labels:
-        io.kompose.service: data-provider
+        io.kompose.service: agent
     spec:
       imagePullSecrets:
         - name: harbor-creds
       containers:
-        - env:
-            - name: POSTGRES_PASSWORD
-              value: mypassword
-            - name: POSTGRES_USER
-              value: myuser
-            - name: REDIS_PASSWORD
-              value: myredispassword
-          image: harbor.devops-teta.ru/bergman-valery/data-provider:latest
+        - image: harbor.devops-teta.ru/bergman-valery/agent:latest
           imagePullPolicy: Always
-          name: data-provider-service
+          name: agent-service
           ports:
             - containerPort: 8080
               protocol: TCP
           volumeMounts:
-            - mountPath: /etc/data-provider-service/config.yaml
-              name: data-provider-cm0
+            - mountPath: /etc/agent-service/config.yaml
+              name: agent-cm0
               subPath: config.yaml
+            - mountPath: /certs
+              name: certs
       restartPolicy: Always
       volumes:
         - configMap:
             items:
-              - key: data-provider-config.yaml
+              - key: agent-config.yaml
                 path: config.yaml
-            name: data-provider-cm0
-          name: data-provider-cm0
+            name: agent-cm0
+          name: agent-cm0
+        - name: certs
+          persistentVolumeClaim:
+            claimName: certs

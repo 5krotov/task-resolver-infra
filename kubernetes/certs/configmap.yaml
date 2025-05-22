@@ -1,0 +1,100 @@
+apiVersion: v1
+data:
+  agent-service.conf: |-
+    [ req ]
+    default_bits        = 2048
+    distinguished_name  = req_distinguished_name
+    prompt              = no
+
+    [ req_distinguished_name ]
+    C  = RU
+    O  = 5krotov
+    OU = Service
+    CN = agent-service
+
+    [ v3_req ]
+    basicConstraints       = CA:FALSE
+    keyUsage              = critical, digitalSignature, keyEncipherment
+    extendedKeyUsage      = serverAuth, clientAuth
+    subjectAltName        = DNS:agent-service
+    subjectKeyIdentifier  = hash
+  api-service.conf: |-
+    [ req ]
+    default_bits        = 2048
+    distinguished_name  = req_distinguished_name
+    prompt              = no
+
+    [ req_distinguished_name ]
+    C  = RU
+    O  = 5krotov
+    OU = Service
+    CN = api-service
+
+    [ v3_req ]
+    basicConstraints       = CA:FALSE
+    keyUsage              = critical, digitalSignature, keyEncipherment
+    extendedKeyUsage      = serverAuth, clientAuth
+    subjectAltName        = DNS:api-service
+    subjectKeyIdentifier  = hash
+  data-provider-service.conf: |-
+    [ req ]
+    default_bits        = 2048
+    distinguished_name  = req_distinguished_name
+    prompt              = no
+
+    [ req_distinguished_name ]
+    C  = RU
+    O  = 5krotov
+    OU = Service
+    CN = data-provider-service
+
+    [ v3_req ]
+    basicConstraints       = CA:FALSE
+    keyUsage              = critical, digitalSignature, keyEncipherment
+    extendedKeyUsage      = serverAuth, clientAuth
+    subjectAltName        = DNS:data-provider-service
+    subjectKeyIdentifier  = hash
+  internal-ca.conf: |-
+    [ req ]
+    default_bits        = 4096
+    distinguished_name  = req_distinguished_name
+    prompt              = no
+    x509_extensions     = v3_ca
+
+    [ req_distinguished_name ]
+    C  = RU
+    O  = 5krotov
+    OU = Internal CA
+    CN = MS Internal CA
+
+    [ v3_ca ]
+    basicConstraints       = critical, CA:TRUE, pathlen:0
+    keyUsage              = critical, digitalSignature, keyCertSign, cRLSign
+    subjectKeyIdentifier  = hash
+    authorityKeyIdentifier= keyid:always,issuer:always
+  root-ca.conf: |-
+    [ req ]
+    default_bits        = 4096
+    distinguished_name  = req_distinguished_name
+    prompt              = no
+    x509_extensions     = v3_ca
+
+    [ req_distinguished_name ]
+    C  = RU
+    O  = 5krotov
+    OU = Root CA
+    CN = MS Root CA
+
+    [ v3_ca ]
+    basicConstraints       = critical, CA:TRUE, pathlen:1
+    keyUsage              = critical, digitalSignature, keyCertSign, cRLSign
+    subjectKeyIdentifier  = hash
+    authorityKeyIdentifier= keyid:always,issuer:always
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: certs
+  name: certs-configs
+  namespace: bergman-hl

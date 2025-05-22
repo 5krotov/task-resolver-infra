@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-nginx-ingress
+  namespace: bergman-hl-metrics
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - bergman-task-resolver-grafana.mfti.devops-teta.ru
+    secretName: grafana-tls-secret-le
+  rules:
+  - host: bergman-task-resolver-grafana.mfti.devops-teta.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kube-prometheus-stack-grafana
+            port:
+              number: 80

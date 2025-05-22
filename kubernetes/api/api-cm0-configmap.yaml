@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  api-config.yaml: |-
+    api-service:
+      http:
+        addr: 0.0.0.0:8080
+    agent:
+      addr: agent:8080
+      useTLS: true
+      grpcServerName: "agent-service"
+    data-provider:
+      addr: data-provider:8080
+      useTLS: true
+      grpcServerName: "data-provider-service"
+    grpc-client:
+      caCert: "/certs/internal/internal-ca.pem"
+      clientCert: "/certs/api-service/api-service.pem"
+      clientKey: "/certs/api-service/api-service-key.pem"
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: api
+  name: api-cm0
