@@ -12,7 +12,7 @@
 # 
 # $ update-task-resolver.sh  # теперь это валидная команда вашего терминала
 
-main_repo_path=<absolute-path-to-main-repo>
+main_repo_path="<absolute-path-to-main-repo>"
 
 cd $main_repo_path
 
